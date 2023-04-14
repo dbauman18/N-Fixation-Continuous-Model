@@ -1,4 +1,5 @@
 # we make plots of what occurs over time
+dev.off()
 
 data <- as.data.frame(out)
 
@@ -49,3 +50,6 @@ layout(layout_matrix_biomass)
 plot(times, data$nonFixerN*wN1, 'l', main = "Non-Fixer Biomass",xlab = "Time [yr]", ylab = "g C")
 plot(times, data$fixerN*wP1, 'l', main = "Fixer Biomass",xlab = "Time [yr]",ylab = "g C")
 
+
+plot(xF, yF)
+lines(xNF, yNF, t = "p", col = "red")

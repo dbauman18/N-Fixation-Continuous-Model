@@ -19,8 +19,8 @@ Grid <- setup.grid.2D(x.grid = x.grid, y.grid = y.grid)
 # set tree locations randomly
 
 j <- 5 #number NF
-k <- 10 #number F
-r <- 2
+k <- 5 #number F
+r <- 3
 
 xNF <- runif(n = j, min = 0, max = L)
 yNF <- runif(n = j, min = 0, max = L)
@@ -35,18 +35,18 @@ y <- Grid$y.mid
 
 
 # store the rooting kernel and litter arrays for each plant
-lambda <- 10  # rate of litter transfer. Lower lambda means more dispersal
+lambda <- 3# rate of litter transfer. Lower lambda means more dispersal
 
 rootingKernelNF <- list()
 litterKernelNF <- list()
 for (i in 1:j){
   root <- outer(x,y, function(x,y){
-    v <- rMaxNF[i]^2 - (x-xNF[i])^2 - (y-yNF[i])^2
+    v <- rMaxNF[i]^2 - ((x-xNF[i] + 3*L/2) %% L - L/2)^2 - ((y-yNF[i]+3*L/2) %% L - L/2)^2
     return(v * (v>= 0))
   })
   rootingKernelNF[[i]] <- root/sum(root)*rMaxNF[i]^2 # rMax is the benefit multiplier of larger roots
   lit <- outer(x,y, function(x,y){
-    return(lambda^2*exp(-lambda*sqrt((x-xNF[i])^2 + (y-yNF[i])^2)/(2*pi)))
+    return(lambda^2*exp(-lambda*sqrt(((x-xNF[i] + 3*L/2) %% L - L/2)^2 + ((y-yNF[i]+3*L/2) %% L - L/2)^2)/(2*pi)))
   })
   litterKernelNF[[i]] <- lit/sum(lit)
 }
@@ -55,12 +55,12 @@ rootingKernelF <- list()
 litterKernelF <- list()
 for (i in 1:k){
   root <- outer(x,y, function(x,y){
-    v <- rMaxF[i]^2 - (x-xF[i])^2 - (y-yF[i])^2
+    v <- rMaxF[i]^2 - ((x-xF[i] + 3*L/2) %% L - L/2)^2 - ((y-yF[i]+3*L/2) %% L - L/2)^2
     return(v * (v>= 0))
   })
   rootingKernelF[[i]] <- root/sum(root)*rMaxF[i]^2
   lit <- outer(x,y, function(x,y){
-    return(lambda^2*exp(-lambda*sqrt((x-xF[i])^2 + (y-yF[i])^2)/(2*pi)))
+    return(lambda^2*exp(-lambda*sqrt(((x-xF[i] + 3*L/2) %% L - L/2)^2 + ((y-yF[i]+3*L/2) %% L - L/2)^2)/(2*pi)))
   })
   litterKernelF[[i]] <- lit/sum(lit)
 }
@@ -230,16 +230,16 @@ vP2 <- 0.0002 # m^2/g C/y
 u1 <- 0.1 # /y
 u2 <- 0.1 # /y
 
-DA <- 2 # diffusion constant of available
-DL <- 6 # diffusion constant of litter
-uxA <- 0 # x advection of available
+DA <- 4 # diffusion constant of available
+DL <- 4 # diffusion constant of litter
+uxA <- -14 # x advection of available
 uyA <- 0 # y advection of available
-uxL <- 0 # x advection of litter
+uxL <- -10 # x advection of litter
 uyL <- 0 # y advection of litter
 
 
-IN <- 0.5 # g N/m^2/y input of N 
-IP <- 0.05 # g P/m^2/y abiotic input of P
+IN <- 0.6 # g N/m^2/y input of N 
+IP <- 0.06 # g P/m^2/y abiotic input of P
 
 # rate at which SOM becomes available, and amount which actually becomes available (rest mineralized)
 kN <- 0.1
@@ -278,10 +278,9 @@ ilP <- 0
 
 yInitial = c(rep(iaN, N^2), rep(iaP, N^2), rep(ilN, N^2), rep(ilP, N^2), 
              rep(SOM_N, N^2), rep(SOM_P, N^2), rMaxNF*iBNF/r, rMaxF*iBF/r)
-y <- yInitial
 require(deSolve)
 
-t <- 200
+t <- 1000
 times <- seq (from = 0, to = t, by = 0.2) #t year simulation
 
 

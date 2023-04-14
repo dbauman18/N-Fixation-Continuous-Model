@@ -26,19 +26,65 @@ library(gifski)
 x <- Grid$x.mid
 y <- Grid$y.mid
 
-out[,1:(N^2+1)] %>%
-  as.data.frame %>% 
-  pivot_longer(cols=-time, names_to="row", values_to="value") %>%
-  mutate(
-    row = as.numeric(row),
-    x = x[(row-1) %% N + 1],
-    y = y[(row-1) %/% N +1]) %>%
-  ggplot() +
-  geom_tile(aes(x=x,y=y,fill=value)) +
-  scale_fill_gradientn(limits=c(min(out[, 2:(N^2+1)]),max(out[, 2:(N^2+1)])),
-                       colors=c("blue","green")) +
-  transition_time(time) + 
-  labs(title = "Available nitrogen pool over 20 years")
+times <- out[,1]
+AN <- out[,2:(N^2+1)]
+AP <- out[,(N^2 + 2):(2*N^2 + 1)]
+LN <- out[,(2*N^2 +2):(3*N^2 + 1)]
+LP <- out[,(3*N^2 + 2):(4*N^2 + 1)]
+ON <- out[,(4*N^2 + 2):(5*N^2 + 1)]
+OP <- out[,(5*N^2 + 2):(6*N^2 + 1)]
+NonFixers <- out[,(6*N^2 + 2):(6*N^2 + 1 + j)]
+Fixers <- out[,(6*N^2 + 2 + j):(6*N^2 + 1 + j + k)]
 
 
+makeGif <- function(time, data, min_time, name){
+  new_data <-  
+    cbind(time=time, data) %>%
+    as.data.frame() %>% 
+    pivot_longer(cols=-time, names_to="row", values_to="value") %>%
+    mutate(
+      row = as.numeric(row)-min(as.numeric(row))+1,
+      x = x[(row-1) %% N + 1],
+      y = y[(row-1) %/% N +1]) %>%
+    filter(time>min_time)
+  return(ggplot(new_data) +
+    geom_tile(aes(x=x,y=y,fill=value)) +
+    scale_fill_gradientn(limits=c(min(new_data$value),max(new_data$value)),
+                         colors=rev(rainbow(7)[1:6])) +
+    transition_time(time) + 
+    labs(title = paste0(name),
+         subtitle="Year: {as.integer(frame_time)}") +
+    scale_x_continuous(expand=c(0,0), breaks=seq(0,N,5)) +
+    scale_y_continuous(expand=c(0,0), breaks=seq(0,N,5)))
+}
+
+# data <- cbind(var=list(rep(c("AN", "AP", "LN", "LP"), time=rep(times,4),each=length(times))),rbind(AN, AP, LN, LP))
+# data %>%
+#   as.data.frame() %>% 
+#   pivot_longer(cols=-time, names_to="row", values_to="value") %>% 
+#   mutate(row = as.numeric(row),
+#     x = x[(row-1) %% N + 1],
+#     y = y[(row-1) %/% N +1]) %>%
+#   filter(time > min_time)
+
+makeGif(times, LN, 15, "litter N")
+# makeGif(times, LP, 15, "litter P")
+makeGif(times, AN, 15, "available N")
+# makeGif(times, AP, 15, "available P")
+
+# out[,1:(N^2+1)] %>%
+#   as.data.frame %>% 
+#   pivot_longer(cols=-time, names_to="row", values_to="value") %>%
+#   mutate(
+#     row = as.numeric(row),
+#     x = x[(row-1) %% N + 1],
+#     y = y[(row-1) %/% N +1]) %>%
+#   ggplot() +
+#   geom_tile(aes(x=x,y=y,fill=value)) +
+#   scale_fill_gradientn(limits=c(min(out[, 2:(N^2+1)]),max(out[, 2:(N^2+1)])),
+#                        colors=c("blue","green")) +
+#   transition_time(time) + 
+#   labs(title = "Available nitrogen pool over 20 years")
+# 
+# 
 
