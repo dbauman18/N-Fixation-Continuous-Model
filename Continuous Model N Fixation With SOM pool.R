@@ -20,7 +20,7 @@ Grid <- setup.grid.2D(x.grid = x.grid, y.grid = y.grid)
 
 j <- 5 #number NF
 k <- 10 #number F
-r <- 3
+r <- 2
 
 xNF <- runif(n = j, min = 0, max = L)
 yNF <- runif(n = j, min = 0, max = L)
@@ -242,16 +242,17 @@ IN <- 0.5 # g N/m^2/y input of N
 IP <- 0.05 # g P/m^2/y abiotic input of P
 
 # rate at which SOM becomes available, and amount which actually becomes available (rest mineralized)
-kN <- 0.05
-kP <- 0.05
-gammaN <- 0.95
-gammaP <- 0.95
+kN <- 0.1
+kP <- 0.1
+gammaN <- 0.98
+gammaP <- 0.98
 
 
 dN <- 4 # rate of litter decomposition
 dP <- 4 # rate of litter decomposition
-eN <- 0.8 # proportion of litter N decomp that goes to organic
-eP <- 0.8 # proportion of litter P decomp that goes to organic
+eN <- 0.9 # proportion of litter N decomp that goes to organic
+eP <- 0.9 # proportion of litter P decomp that goes to organic
+
 
 mN <- 0.04 # rate which available N lost to environment
 mP <- 0.03 # rate which available P lost to environment
@@ -267,8 +268,8 @@ iaN <- SOM_N*proportionAvailable * cellArea
 iaP <- SOM_P*proportionAvailable * cellArea
 ilN <- 25*cellArea
 ilP <- 2*cellArea
-iBNF <- 500000
-iBF <-500000
+iBNF <- 5000
+iBF <-5000
 
 seasonal_litterfall <- FALSE #If true, then u1, u2 become periodic (most litter drops at a certain time)
 ilN <- 0
@@ -280,7 +281,7 @@ yInitial = c(rep(iaN, N^2), rep(iaP, N^2), rep(ilN, N^2), rep(ilP, N^2),
 y <- yInitial
 require(deSolve)
 
-t <- 1000
+t <- 200
 times <- seq (from = 0, to = t, by = 0.2) #t year simulation
 
 
